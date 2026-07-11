@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>View Doctors</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f8f8f8;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        margin: 50px auto;
+        width: 80%;
+      }
+      h2 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+      }
+      th,
+      td {
+        padding: 12px;
+        border: 1px solid #ddd;
+        text-align: center;
+      }
+      th {
+        background: #007bff;
+        color: white;
+      }
+      tr:hover {
+        background: #f1f1f1;
+      }
+      .back-btn {
+        display: block;
+        width: fit-content;
+        margin: 20px auto;
+        padding: 10px 15px;
+        background: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+      }
+      .back-btn:hover {
+        background: #0056b3;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Available Doctors</h2>
+
+      {% if doctors %}
+      <table>
+        <tr>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Specialty</th>
+          <th>License Number</th>
+        </tr>
+        {% for doc in doctors %}
+        <tr>
+          <td>{{ doc.first_name }}</td>
+          <td>{{ doc.last_name }}</td>
+          <td>{{ doc.specialty }}</td>
+          <td>{{ doc.license_number }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+      {% else %}
+      <h3 style="text-align: center; color: red">No doctors found.</h3>
+      {% endif %}
+
+      <a href="{% url 'patient_dashboard' %}" class="back-btn"
+        >Back to Dashboard</a
+      >
+    </div>
+  </body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My Prescriptions</title>
+    <style>
+      table {
+        width: 70%;
+        border-collapse: collapse;
+        margin: 30px auto;
+      }
+      th,
+      td {
+        padding: 10px;
+        border: 1px solid black;
+        text-align: center;
+      }
+      th {
+        background: #4caf50;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <h2 style="text-align: center">My Prescriptions</h2>
+
+    <table>
+      <tr>
+        <th>Doctor Name</th>
+        <th>Disease</th>
+        <th>Prescriptions</th>
+      </tr>
+
+      {% for p in prescriptions %}
+      <tr>
+        <td>{{ p.doctor_name }}</td>
+        <td>{{ p.disease }}</td>
+        <td>{{ p.prescription_text }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="3">No prescriptions found</td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    <div style="text-align: center; margin-top: 20px">
+      <a href="{% url 'patient_dashboard' %}">Back to Dashboard</a>
+    </div>
+  </body>
+</html>

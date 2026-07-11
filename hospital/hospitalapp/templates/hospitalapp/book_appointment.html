@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Book Appointment</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+        padding: 20px;
+      }
+
+      h2 {
+        text-align: center;
+      }
+
+      .form-container {
+        background: white;
+        padding: 20px;
+        width: 400px;
+        margin: auto;
+        border-radius: 8px;
+        box-shadow: 0 0 10px #ccc;
+      }
+
+      label {
+        font-weight: bold;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        box-sizing: border-box;
+      }
+
+      button {
+        padding: 10px;
+        width: 100%;
+        background: blue;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: darkblue;
+      }
+
+      .msg {
+        color: green;
+        text-align: center;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Book Appointment</h2>
+
+    <div class="form-container">
+      <form method="POST">
+        {% csrf_token %}
+
+        <label>Select Doctor:</label>
+        <select name="doctor_id" required>
+          {% for doc in doctors %}
+          <option value="{{ doc.id }}">
+            Dr. {{ doc.first_name }} {{ doc.last_name }} - {{ doc.specialty }}
+          </option>
+          {% endfor %}
+        </select>
+
+        <label>Select Date:</label>
+        <input type="date" name="date" required />
+
+        <label>Select Time:</label>
+        <input type="time" name="time" required />
+
+        <button type="submit">Book Appointment</button>
+      </form>
+
+      {% if msg %}
+      <p class="msg">{{ msg }}</p>
+      {% endif %}
+    </div>
+  </body>
+</html>
