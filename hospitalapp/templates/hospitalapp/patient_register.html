@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Registration - MediCare HMS</title>
+  <link rel="stylesheet" href="{% static 'hospitalapp/css/style.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="{% url 'home' %}" class="brand-logo">
+        <i class="fa-solid fa-hospital"></i>
+        <span>MediCare HMS</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="{% url 'home' %}" class="nav-link">Home</a></li>
+        <li><a href="{% url 'patient_login' %}" class="nav-link">Patient Sign In</a></li>
+        <li><a href="{% url 'patient_register' %}" class="nav-link active">Patient Registration</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="main-wrapper">
+    <div class="form-box" style="max-width: 680px;">
+      <h2 class="form-title"><i class="fa-solid fa-user-plus" style="color: var(--primary);"></i> Patient Registration</h2>
+      <p class="form-subtitle">Fill in your details below to create your official hospital digital health record.</p>
+
+      {% if messages %}
+      <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          <i class="fa-solid fa-circle-info"></i> {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <form method="POST">
+        {% csrf_token %}
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">First Name *</label>
+            <input type="text" name="first_name" class="form-control" placeholder="John" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last Name *</label>
+            <input type="text" name="last_name" class="form-control" placeholder="Doe" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" name="email" class="form-control" placeholder="john.doe@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number *</label>
+            <input type="text" name="phone_number" class="form-control" placeholder="9876543210" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Date of Birth</label>
+            <input type="date" name="date_of_birth" class="form-control">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Gender</label>
+            <select name="gender" class="form-control">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Blood Group</label>
+            <select name="blood_group" class="form-control">
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Emergency Contact Phone</label>
+            <input type="text" name="emergency_contact" class="form-control" placeholder="+1 555-000-1111">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Residential Address</label>
+          <input type="text" name="address" class="form-control" placeholder="123 Health Street, City, State">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full" style="padding: 0.9rem; margin-top: 1rem;"><i class="fa-solid fa-check-circle"></i> Create Patient Account & Generate MRN</button>
+      </form>
+
+      <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem;">
+        Already registered? <a href="{% url 'patient_login' %}" style="font-weight: 700;">Sign In Here</a>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

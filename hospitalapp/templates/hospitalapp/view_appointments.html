@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Appointments - Dr. {{ doctor.last_name }}</title>
+  <link rel="stylesheet" href="{% static 'hospitalapp/css/style.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="{% url 'doctor_dashboard' %}" class="brand-logo">
+        <i class="fa-solid fa-hospital"></i>
+        <span>MediCare Doctor Portal</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="{% url 'doctor_dashboard' %}" class="nav-link"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+        <li><a href="{% url 'view_appointments' %}" class="nav-link active"><i class="fa-solid fa-calendar-check"></i> Appointments</a></li>
+        <li><a href="{% url 'view_patients' %}" class="nav-link"><i class="fa-solid fa-users"></i> Patients</a></li>
+        <li><a href="{% url 'doctor_logout' %}" class="btn btn-secondary btn-sm" style="color: var(--danger);"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="main-wrapper">
+
+    {% if messages %}
+    <div class="messages-container">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        <i class="fa-solid fa-circle-check"></i> {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card-box">
+      <div class="card-header">
+        <h2 class="card-title"><i class="fa-solid fa-calendar-days" style="color: var(--primary);"></i> Appointment Schedule for Dr. {{ doctor.first_name }} {{ doctor.last_name }}</h2>
+      </div>
+
+      <!-- Filter Bar -->
+      <div style="margin-bottom: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <a href="{% url 'view_appointments' %}" class="btn btn-sm {% if not selected_status %}btn-primary{% else %}btn-secondary{% endif %}">All</a>
+        <a href="{% url 'view_appointments' %}?status=Scheduled" class="btn btn-sm {% if selected_status == 'Scheduled' %}btn-primary{% else %}btn-secondary{% endif %}">Scheduled</a>
+        <a href="{% url 'view_appointments' %}?status=Confirmed" class="btn btn-sm {% if selected_status == 'Confirmed' %}btn-primary{% else %}btn-secondary{% endif %}">Confirmed</a>
+        <a href="{% url 'view_appointments' %}?status=Completed" class="btn btn-sm {% if selected_status == 'Completed' %}btn-primary{% else %}btn-secondary{% endif %}">Completed</a>
+        <a href="{% url 'view_appointments' %}?status=Cancelled" class="btn btn-sm {% if selected_status == 'Cancelled' %}btn-primary{% else %}btn-secondary{% endif %}">Cancelled</a>
+      </div>
+
+      {% if appointments %}
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Patient Name</th>
+              <th>MRN</th>
+              <th>Date & Time</th>
+              <th>Reason for Visit</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for app in appointments %}
+            <tr>
+              <td>
+                <div style="font-weight: 700; color: var(--secondary);">{{ app.patient.first_name }} {{ app.patient.last_name }}</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Age: {{ app.patient.age|default:"N/A" }} | Gender: {{ app.patient.gender|default:"N/A" }}</div>
+              </td>
+              <td><code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">{{ app.patient.medical_record_number }}</code></td>
+              <td><b>{{ app.date }}</b> at {{ app.time|time:"h:i A" }}</td>
+              <td>{{ app.reason|default:"Consultation" }}</td>
+              <td><span class="badge badge-{{ app.status|lower }}">{{ app.status }}</span></td>
+              <td>
+                <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+                  {% if app.status == 'Scheduled' %}
+                  <a href="{% url 'update_appointment_status' app.id 'Confirmed' %}" class="btn btn-secondary btn-sm" style="color: var(--warning);"><i class="fa-solid fa-check"></i> Confirm</a>
+                  {% endif %}
+
+                  {% if app.status != 'Completed' and app.status != 'Cancelled' %}
+                  <a href="{% url 'add_prescription_for_appointment' app.id %}" class="btn btn-accent btn-sm"><i class="fa-solid fa-prescription"></i> Complete & Prescribe</a>
+                  <a href="{% url 'update_appointment_status' app.id 'Cancelled' %}" class="btn btn-danger btn-sm" onclick="return confirm('Cancel this appointment?');">Cancel</a>
+                  {% endif %}
+
+                  {% if app.status == 'Completed' %}
+                  <a href="{% url 'add_prescription_for_appointment' app.id %}" class="btn btn-secondary btn-sm"><i class="fa-solid fa-file-medical"></i> View / Edit Rx</a>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+        <i class="fa-solid fa-calendar-xmark" style="font-size: 3rem; color: var(--text-light); margin-bottom: 1rem;"></i>
+        <p>No appointments found for this filter.</p>
+      </div>
+      {% endif %}
+
+      <div style="margin-top: 1.5rem;">
+        <a href="{% url 'doctor_dashboard' %}" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

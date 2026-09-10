@@ -1,0 +1,187 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Dashboard - MediCare HMS</title>
+  <link rel="stylesheet" href="{% static 'hospitalapp/css/style.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="{% url 'patient_dashboard' %}" class="brand-logo">
+        <i class="fa-solid fa-hospital"></i>
+        <span>MediCare Patient Portal</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="{% url 'patient_dashboard' %}" class="nav-link active"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+        <li><a href="{% url 'book_appointment' %}" class="nav-link"><i class="fa-solid fa-calendar-plus"></i> Book Appointment</a></li>
+        <li><a href="{% url 'view_doctors' %}" class="nav-link"><i class="fa-solid fa-user-doctor"></i> View Doctors</a></li>
+        <li><a href="{% url 'view_prescriptions' %}" class="nav-link"><i class="fa-solid fa-prescription-bottle-medical"></i> Prescriptions</a></li>
+        <li><a href="{% url 'patient_queries' %}" class="nav-link"><i class="fa-solid fa-comments"></i> Support Queries</a></li>
+        <li><a href="{% url 'patient_logout' %}" class="btn btn-secondary btn-sm" style="color: var(--danger);"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="main-wrapper">
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="messages-container">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        <i class="fa-solid fa-circle-check"></i> {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="dashboard-grid">
+
+      <!-- Sidebar -->
+      <aside>
+        <div class="sidebar-card">
+          <div class="profile-avatar">
+            {{ patient.first_name|first }}{{ patient.last_name|first }}
+          </div>
+          <h3 class="profile-name">{{ patient.first_name }} {{ patient.last_name }}</h3>
+          <p class="profile-role">Medical Record No: <b>{{ patient.medical_record_number }}</b></p>
+          
+          <div style="border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+            <div style="margin-bottom: 0.5rem;"><i class="fa-solid fa-phone" style="width: 20px; color: var(--primary);"></i> {{ patient.phone_number|default:"N/A" }}</div>
+            <div style="margin-bottom: 0.5rem;"><i class="fa-solid fa-envelope" style="width: 20px; color: var(--primary);"></i> {{ patient.email|default:"N/A" }}</div>
+            <div style="margin-bottom: 0.5rem;"><i class="fa-solid fa-droplet" style="width: 20px; color: var(--danger);"></i> Blood Group: <b>{{ patient.blood_group|default:"Unspecified" }}</b></div>
+            <div><i class="fa-solid fa-location-dot" style="width: 20px; color: var(--primary);"></i> {{ patient.address }}</div>
+          </div>
+
+          <ul class="sidebar-menu" style="margin-top: 1.5rem;">
+            <li><a href="{% url 'book_appointment' %}" class="sidebar-link"><i class="fa-solid fa-calendar-plus" style="color: var(--primary);"></i> Book Consultation</a></li>
+            <li><a href="{% url 'view_prescriptions' %}" class="sidebar-link"><i class="fa-solid fa-file-medical" style="color: var(--accent);"></i> My Prescriptions</a></li>
+            <li><a href="{% url 'patient_queries' %}" class="sidebar-link"><i class="fa-solid fa-headset" style="color: var(--warning);"></i> Ask Doctor / Query</a></li>
+            <li><a href="{% url 'patient_logout' %}" class="sidebar-link logout-link"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a></li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- Main Section -->
+      <main>
+        
+        <!-- Quick Stats -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-icon blue"><i class="fa-solid fa-calendar-days"></i></div>
+            <div>
+              <div class="stat-val">{{ upcoming_count }}</div>
+              <div class="stat-lbl">Upcoming Visits</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon green"><i class="fa-solid fa-pills"></i></div>
+            <div>
+              <div class="stat-val">{{ prescriptions_count }}</div>
+              <div class="stat-lbl">Active Prescriptions</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon amber"><i class="fa-solid fa-circle-question"></i></div>
+            <div>
+              <div class="stat-val">{{ queries_count }}</div>
+              <div class="stat-lbl">Medical Queries</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upcoming Appointments Card -->
+        <div class="card-box">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fa-solid fa-calendar-check" style="color: var(--primary);"></i> Upcoming Appointments</h3>
+            <a href="{% url 'book_appointment' %}" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> Book New</a>
+          </div>
+
+          {% if upcoming_appointments %}
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Doctor</th>
+                  <th>Specialty</th>
+                  <th>Date & Time</th>
+                  <th>Reason</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for app in upcoming_appointments %}
+                <tr>
+                  <td>
+                    <div style="font-weight: 700; color: var(--secondary);">Dr. {{ app.doctor.first_name }} {{ app.doctor.last_name }}</div>
+                  </td>
+                  <td>{{ app.doctor.specialty }}</td>
+                  <td><b>{{ app.date }}</b> at {{ app.time|time:"h:i A" }}</td>
+                  <td>{{ app.reason|default:"General Consultation" }}</td>
+                  <td>
+                    <span class="badge badge-{{ app.status|lower }}">{{ app.status }}</span>
+                  </td>
+                  <td>
+                    {% if app.status == 'Scheduled' or app.status == 'Confirmed' %}
+                    <a href="{% url 'cancel_appointment' app.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to cancel this appointment?');">Cancel</a>
+                    {% else %}
+                    <span style="color: var(--text-muted); font-size: 0.85rem;">N/A</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+            <i class="fa-solid fa-calendar-xmark" style="font-size: 2.5rem; margin-bottom: 0.75rem; color: var(--text-light);"></i>
+            <p>No upcoming appointments scheduled.</p>
+            <a href="{% url 'book_appointment' %}" class="btn btn-primary btn-sm" style="margin-top: 1rem;">Book your first appointment</a>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Recent Prescriptions -->
+        <div class="card-box">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fa-solid fa-prescription-bottle-medical" style="color: var(--accent);"></i> Recent Medical Prescriptions</h3>
+            <a href="{% url 'view_prescriptions' %}" class="btn btn-secondary btn-sm">View All</a>
+          </div>
+
+          {% if recent_prescriptions %}
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            {% for p in recent_prescriptions %}
+            <div style="background: #f8fafc; border: 1px solid var(--border); padding: 1.25rem; border-radius: var(--radius-md);">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                <div>
+                  <h4 style="font-weight: 700; color: var(--secondary);">Diagnosis: {{ p.disease }}</h4>
+                  <p style="font-size: 0.85rem; color: var(--text-muted);">Prescribed by: <b>{% if p.doctor %}Dr. {{ p.doctor.first_name }} {{ p.doctor.last_name }}{% else %}{{ p.doctor_name }}{% endif %}</b> on {{ p.created_at|date:"M d, Y" }}</p>
+                </div>
+                <span class="badge badge-completed">{{ p.duration }}</span>
+              </div>
+              <div style="background: white; padding: 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border); font-size: 0.9rem; font-family: monospace; white-space: pre-line;">{{ p.prescription_text }}</div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <p style="color: var(--text-muted); text-align: center; padding: 1.5rem;">No medical prescriptions on file.</p>
+          {% endif %}
+        </div>
+
+      </main>
+
+    </div>
+  </div>
+
+</body>
+</html>

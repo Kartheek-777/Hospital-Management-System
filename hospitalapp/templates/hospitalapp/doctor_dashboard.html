@@ -1,0 +1,160 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doctor Clinical Dashboard - MediCare HMS</title>
+  <link rel="stylesheet" href="{% static 'hospitalapp/css/style.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="{% url 'doctor_dashboard' %}" class="brand-logo">
+        <i class="fa-solid fa-hospital"></i>
+        <span>MediCare Doctor Portal</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="{% url 'doctor_dashboard' %}" class="nav-link active"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+        <li><a href="{% url 'view_appointments' %}" class="nav-link"><i class="fa-solid fa-calendar-check"></i> Appointments</a></li>
+        <li><a href="{% url 'view_patients' %}" class="nav-link"><i class="fa-solid fa-users"></i> Patient Records</a></li>
+        <li><a href="{% url 'add_prescription' %}" class="nav-link"><i class="fa-solid fa-prescription"></i> Issue Prescription</a></li>
+        <li><a href="{% url 'doctor_logout' %}" class="btn btn-secondary btn-sm" style="color: var(--danger);"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="main-wrapper">
+
+    {% if messages %}
+    <div class="messages-container">
+      {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        <i class="fa-solid fa-circle-check"></i> {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="dashboard-grid">
+
+      <!-- Sidebar -->
+      <aside>
+        <div class="sidebar-card">
+          <div class="profile-avatar" style="background: linear-gradient(135deg, #4f46e5, #0ea5e9);">
+            <i class="fa-solid fa-user-doctor"></i>
+          </div>
+          <h3 class="profile-name">Dr. {{ doctor.first_name }} {{ doctor.last_name }}</h3>
+          <p class="profile-role">Specialty: <b>{{ doctor.specialty }}</b></p>
+
+          <div style="border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+            <div style="margin-bottom: 0.5rem;"><i class="fa-solid fa-id-badge" style="width: 20px; color: var(--primary);"></i> License: <b>{{ doctor.license_number }}</b></div>
+            <div style="margin-bottom: 0.5rem;"><i class="fa-solid fa-graduation-cap" style="width: 20px; color: var(--primary);"></i> {{ doctor.qualification }}</div>
+            <div style="margin-bottom: 0.5rem;"><i class="fa-solid fa-clock" style="width: 20px; color: var(--primary);"></i> {{ doctor.available_days }}</div>
+            <div><i class="fa-solid fa-dollar-sign" style="width: 20px; color: var(--accent);"></i> Fee: ${{ doctor.consultation_fee }}</div>
+          </div>
+
+          <ul class="sidebar-menu" style="margin-top: 1.5rem;">
+            <li><a href="{% url 'view_appointments' %}" class="sidebar-link"><i class="fa-solid fa-calendar-days" style="color: var(--primary);"></i> Manage Appointments</a></li>
+            <li><a href="{% url 'add_prescription' %}" class="sidebar-link"><i class="fa-solid fa-prescription-bottle-medical" style="color: var(--accent);"></i> Write Prescription</a></li>
+            <li><a href="{% url 'view_patients' %}" class="sidebar-link"><i class="fa-solid fa-address-book" style="color: #9333ea;"></i> View My Patients</a></li>
+            <li><a href="{% url 'doctor_logout' %}" class="sidebar-link logout-link"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a></li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main>
+        
+        <!-- Stats Row -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-icon blue"><i class="fa-solid fa-calendar-check"></i></div>
+            <div>
+              <div class="stat-val">{{ total_appointments }}</div>
+              <div class="stat-lbl">Total Consultations</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon amber"><i class="fa-solid fa-clock-pulse"></i></div>
+            <div>
+              <div class="stat-val">{{ today_appointments_count }}</div>
+              <div class="stat-lbl">Today's Visits</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
+            <div>
+              <div class="stat-val">{{ completed_appointments_count }}</div>
+              <div class="stat-lbl">Completed Visits</div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon purple"><i class="fa-solid fa-hospital-user"></i></div>
+            <div>
+              <div class="stat-val">{{ patients_count }}</div>
+              <div class="stat-lbl">Assigned Patients</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Today's / Upcoming Appointments Table -->
+        <div class="card-box">
+          <div class="card-header">
+            <h3 class="card-title"><i class="fa-solid fa-list-check" style="color: var(--primary);"></i> Recent Patient Consultations</h3>
+            <a href="{% url 'view_appointments' %}" class="btn btn-primary btn-sm">View All Appointments</a>
+          </div>
+
+          {% if recent_appointments %}
+          <div class="table-responsive">
+            <table class="custom-table">
+              <thead>
+                <tr>
+                  <th>Patient Name</th>
+                  <th>MRN</th>
+                  <th>Date & Time</th>
+                  <th>Visit Reason</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for app in recent_appointments %}
+                <tr>
+                  <td>
+                    <div style="font-weight: 700; color: var(--secondary);">{{ app.patient.first_name }} {{ app.patient.last_name }}</div>
+                  </td>
+                  <td><code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">{{ app.patient.medical_record_number }}</code></td>
+                  <td><b>{{ app.date }}</b> at {{ app.time|time:"h:i A" }}</td>
+                  <td>{{ app.reason|default:"Routine Checkup" }}</td>
+                  <td>
+                    <span class="badge badge-{{ app.status|lower }}">{{ app.status }}</span>
+                  </td>
+                  <td>
+                    <div style="display: flex; gap: 0.35rem;">
+                      <a href="{% url 'add_prescription_for_appointment' app.id %}" class="btn btn-accent btn-sm" title="Write Prescription"><i class="fa-solid fa-prescription"></i> Prescribe</a>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <p style="color: var(--text-muted); text-align: center; padding: 2rem;">No appointments found on your schedule.</p>
+          {% endif %}
+        </div>
+
+      </main>
+
+    </div>
+  </div>
+
+</body>
+</html>

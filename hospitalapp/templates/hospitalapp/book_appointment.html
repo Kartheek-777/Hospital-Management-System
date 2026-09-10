@@ -1,0 +1,85 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book Doctor Appointment - MediCare HMS</title>
+  <link rel="stylesheet" href="{% static 'hospitalapp/css/style.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="{% url 'patient_dashboard' %}" class="brand-logo">
+        <i class="fa-solid fa-hospital"></i>
+        <span>MediCare Patient Portal</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="{% url 'patient_dashboard' %}" class="nav-link"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+        <li><a href="{% url 'book_appointment' %}" class="nav-link active"><i class="fa-solid fa-calendar-plus"></i> Book Appointment</a></li>
+        <li><a href="{% url 'view_doctors' %}" class="nav-link"><i class="fa-solid fa-user-doctor"></i> View Doctors</a></li>
+        <li><a href="{% url 'patient_logout' %}" class="btn btn-secondary btn-sm" style="color: var(--danger);"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="main-wrapper">
+    <div class="form-box" style="max-width: 600px;">
+      <h2 class="form-title"><i class="fa-solid fa-calendar-plus" style="color: var(--primary);"></i> Book Consultation</h2>
+      <p class="form-subtitle">Schedule an appointment with our clinical specialists.</p>
+
+      {% if messages %}
+      <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          <i class="fa-solid fa-circle-check"></i> {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <form method="POST">
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label class="form-label"><i class="fa-solid fa-user-doctor"></i> Select Specialist Doctor *</label>
+          <select name="doctor_id" class="form-control" required>
+            <option value="">-- Choose a Doctor --</option>
+            {% for doc in doctors %}
+            <option value="{{ doc.doctor_id }}">
+              Dr. {{ doc.first_name }} {{ doc.last_name }} ({{ doc.specialty }}) - Fee: ${{ doc.consultation_fee }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label"><i class="fa-solid fa-calendar-days"></i> Preferred Date *</label>
+            <input type="date" name="date" class="form-control" min="{{ today_date }}" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label"><i class="fa-solid fa-clock"></i> Preferred Time *</label>
+            <input type="time" name="time" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><i class="fa-solid fa-notes-medical"></i> Reason for Visit / Symptoms</label>
+          <textarea name="reason" class="form-control" placeholder="Describe any symptoms or purpose of your checkup..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full" style="padding: 0.9rem;"><i class="fa-solid fa-check"></i> Confirm & Book Appointment</button>
+      </form>
+
+      <div style="text-align: center; margin-top: 1.5rem;">
+        <a href="{% url 'patient_dashboard' %}" class="btn btn-secondary btn-sm"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

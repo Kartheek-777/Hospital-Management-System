@@ -1,0 +1,91 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Directory - Dr. {{ doctor.last_name }}</title>
+  <link rel="stylesheet" href="{% static 'hospitalapp/css/style.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="{% url 'doctor_dashboard' %}" class="brand-logo">
+        <i class="fa-solid fa-hospital"></i>
+        <span>MediCare Doctor Portal</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="{% url 'doctor_dashboard' %}" class="nav-link"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+        <li><a href="{% url 'view_appointments' %}" class="nav-link"><i class="fa-solid fa-calendar-check"></i> Appointments</a></li>
+        <li><a href="{% url 'view_patients' %}" class="nav-link active"><i class="fa-solid fa-users"></i> Patients</a></li>
+        <li><a href="{% url 'doctor_logout' %}" class="btn btn-secondary btn-sm" style="color: var(--danger);"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="main-wrapper">
+    <div class="card-box">
+      <div class="card-header">
+        <h2 class="card-title"><i class="fa-solid fa-address-book" style="color: var(--primary);"></i> Assigned Patients Directory</h2>
+      </div>
+
+      <!-- Search Bar -->
+      <form method="GET" style="margin-bottom: 1.5rem; display: flex; gap: 0.75rem;">
+        <input type="text" name="q" value="{{ search_query }}" class="form-control" placeholder="Search patient by name, MRN, or phone number...">
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+        {% if search_query %}
+        <a href="{% url 'view_patients' %}" class="btn btn-secondary">Clear</a>
+        {% endif %}
+      </form>
+
+      {% if patients %}
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Patient Name</th>
+              <th>Medical Record No. (MRN)</th>
+              <th>Gender / Age</th>
+              <th>Contact Phone</th>
+              <th>Email</th>
+              <th>Address</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for patient in patients %}
+            <tr>
+              <td>
+                <div style="font-weight: 700; color: var(--secondary);">{{ patient.first_name }} {{ patient.last_name }}</div>
+                <div style="font-size: 0.8rem; color: var(--danger);">Blood Group: <b>{{ patient.blood_group|default:"N/A" }}</b></div>
+              </td>
+              <td><code style="background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: 700;">{{ patient.medical_record_number }}</code></td>
+              <td>{{ patient.gender|default:"N/A" }} / {{ patient.age|default:"N/A" }} Yrs</td>
+              <td><i class="fa-solid fa-phone" style="color: var(--primary); font-size: 0.8rem;"></i> {{ patient.phone_number|default:"N/A" }}</td>
+              <td>{{ patient.email|default:"N/A" }}</td>
+              <td>{{ patient.address }}</td>
+              <td>
+                <a href="{% url 'add_prescription' %}?patient_id={{ patient.id }}" class="btn btn-accent btn-sm"><i class="fa-solid fa-prescription"></i> Prescribe</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div style="text-align: center; padding: 3rem; color: var(--text-muted);">
+        <i class="fa-solid fa-users-slash" style="font-size: 3rem; color: var(--text-light); margin-bottom: 1rem;"></i>
+        <p>No patient records found.</p>
+      </div>
+      {% endif %}
+
+      <div style="margin-top: 1.5rem;">
+        <a href="{% url 'doctor_dashboard' %}" class="btn btn-secondary"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

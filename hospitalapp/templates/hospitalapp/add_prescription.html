@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Issue Medical Prescription - Dr. {{ doctor.last_name }}</title>
+  <link rel="stylesheet" href="{% static 'hospitalapp/css/style.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="{% url 'doctor_dashboard' %}" class="brand-logo">
+        <i class="fa-solid fa-hospital"></i>
+        <span>MediCare Doctor Portal</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="{% url 'doctor_dashboard' %}" class="nav-link"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+        <li><a href="{% url 'view_appointments' %}" class="nav-link"><i class="fa-solid fa-calendar-check"></i> Appointments</a></li>
+        <li><a href="{% url 'add_prescription' %}" class="nav-link active"><i class="fa-solid fa-prescription"></i> Write Prescription</a></li>
+        <li><a href="{% url 'doctor_logout' %}" class="btn btn-secondary btn-sm" style="color: var(--danger);"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="main-wrapper">
+    <div class="form-box" style="max-width: 680px;">
+      <h2 class="form-title"><i class="fa-solid fa-file-signature" style="color: var(--accent);"></i> Issue Medical Prescription</h2>
+      <p class="form-subtitle">Prescribe medications and care instructions for patient health record.</p>
+
+      {% if messages %}
+      <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          <i class="fa-solid fa-circle-check"></i> {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <form method="POST">
+        {% csrf_token %}
+
+        <div class="form-group">
+          <label class="form-label"><i class="fa-solid fa-hospital-user"></i> Select Patient *</label>
+          <select name="patient_id" class="form-control" required>
+            <option value="">-- Choose Patient --</option>
+            {% for pat in patients %}
+            <option value="{{ pat.id }}" {% if target_patient and target_patient.id == pat.id %}selected{% endif %}>
+              {{ pat.first_name }} {{ pat.last_name }} (MRN: {{ pat.medical_record_number }})
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><i class="fa-solid fa-stethoscope"></i> Diagnosis / Disease Name *</label>
+          <input type="text" name="disease" class="form-control" placeholder="e.g. Acute Migraine & Sleep Insomnia" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><i class="fa-solid fa-pills"></i> Prescription Details (Medicines, Dosages & Advice) *</label>
+          <textarea name="prescription_text" class="form-control" style="min-height: 150px;" placeholder="1. Sumatriptan 50mg - 1 tablet as needed&#10;2. Melatonin 3mg - 1 tablet before bedtime&#10;3. Drink plenty of water..." required></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Dosage Schedule</label>
+            <input type="text" name="dosage" class="form-control" placeholder="e.g. Twice daily after meals" value="As directed">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Treatment Duration</label>
+            <input type="text" name="duration" class="form-control" placeholder="e.g. 7 days / 2 weeks" value="7 days">
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-accent btn-full" style="padding: 0.9rem;"><i class="fa-solid fa-paper-plane"></i> Issue & Save Prescription</button>
+      </form>
+
+      <div style="text-align: center; margin-top: 1.5rem;">
+        <a href="{% url 'doctor_dashboard' %}" class="btn btn-secondary btn-sm"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

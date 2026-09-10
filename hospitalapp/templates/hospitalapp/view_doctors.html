@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Specialist Doctors - MediCare HMS</title>
+  <link rel="stylesheet" href="{% static 'hospitalapp/css/style.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="{% url 'home' %}" class="brand-logo">
+        <i class="fa-solid fa-hospital"></i>
+        <span>MediCare HMS</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="{% url 'home' %}" class="nav-link">Home</a></li>
+        <li><a href="{% url 'view_doctors' %}" class="nav-link active">Doctors</a></li>
+        <li><a href="{% url 'patient_login' %}" class="nav-link">Patient Portal</a></li>
+        <li><a href="{% url 'doctor_login' %}" class="nav-link">Doctor Portal</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="main-wrapper">
+
+    <div style="text-align: center; margin-bottom: 2.5rem;">
+      <h1 style="font-size: 2.2rem; font-weight: 800; color: var(--secondary); margin-bottom: 0.5rem;">Our Medical Specialists</h1>
+      <p style="color: var(--text-muted); max-width: 600px; margin: 0 auto;">Meet our highly qualified team of doctors across key clinical departments.</p>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="card-box" style="padding: 1.25rem; margin-bottom: 2rem;">
+      <form method="GET" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+        <div style="flex: 1; min-width: 240px;">
+          <input type="text" name="q" value="{{ search_q }}" class="form-control" placeholder="Search doctor by name or specialty...">
+        </div>
+        <div style="width: 220px;">
+          <select name="dept" class="form-control">
+            <option value="">All Departments</option>
+            {% for dept in departments %}
+            <option value="{{ dept.id }}" {% if selected_dept == dept.id|stringformat:"s" %}selected{% endif %}>{{ dept.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-magnifying-glass"></i> Search</button>
+        {% if search_q or selected_dept %}
+        <a href="{% url 'view_doctors' %}" class="btn btn-secondary">Clear Filters</a>
+        {% endif %}
+      </form>
+    </div>
+
+    <!-- Doctors Cards Grid -->
+    {% if doctors %}
+    <div class="cards-grid">
+      {% for doc in doctors %}
+      <div class="doctor-card">
+        <div class="doctor-avatar">
+          <i class="fa-solid fa-user-doctor"></i>
+        </div>
+        <h3 class="doctor-name">Dr. {{ doc.first_name }} {{ doc.last_name }}</h3>
+        <div class="doctor-spec"><i class="fa-solid fa-stethoscope"></i> {{ doc.specialty }}</div>
+        
+        <ul class="doctor-info-list">
+          <li><b>Qualification:</b> {{ doc.qualification }}</li>
+          <li><b>Experience:</b> {{ doc.experience_years }} Years</li>
+          <li><b>Available:</b> {{ doc.available_days }} ({{ doc.available_time }})</li>
+          <li><b style="color: var(--secondary);">Consultation Fee:</b> <span style="color: var(--accent); font-weight: 700;">${{ doc.consultation_fee }}</span></li>
+        </ul>
+
+        <a href="{% url 'book_appointment' %}" class="btn btn-primary btn-full btn-sm"><i class="fa-solid fa-calendar-plus"></i> Book Appointment</a>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="card-box" style="text-align: center; padding: 3rem;">
+      <i class="fa-solid fa-user-slash" style="font-size: 3rem; color: var(--text-light); margin-bottom: 1rem;"></i>
+      <h3>No doctors found matching your criteria.</h3>
+      <a href="{% url 'view_doctors' %}" class="btn btn-secondary" style="margin-top: 1rem;">View All Doctors</a>
+    </div>
+    {% endif %}
+
+  </div>
+
+</body>
+</html>

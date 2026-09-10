@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Portal Login - MediCare HMS</title>
+  <link rel="stylesheet" href="{% static 'hospitalapp/css/style.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="{% url 'home' %}" class="brand-logo">
+        <i class="fa-solid fa-hospital"></i>
+        <span>MediCare HMS</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="{% url 'home' %}" class="nav-link">Home</a></li>
+        <li><a href="{% url 'patient_login' %}" class="nav-link active">Patient Portal</a></li>
+        <li><a href="{% url 'patient_register' %}" class="btn btn-secondary btn-sm"><i class="fa-solid fa-user-plus"></i> New Patient Sign Up</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="main-wrapper">
+    <div class="form-box">
+      <div style="text-align: center; margin-bottom: 1.5rem;">
+        <i class="fa-solid fa-hospital-user" style="font-size: 3rem; color: var(--accent); background: var(--accent-light); padding: 1.25rem; border-radius: 50%;"></i>
+      </div>
+      <h2 class="form-title">Patient Portal Sign In</h2>
+      <p class="form-subtitle">Enter your Medical Record Number (MRN), phone number, or registered email.</p>
+
+      {% if messages %}
+      <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+          <i class="fa-solid fa-circle-exclamation"></i> {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <form method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+          <label class="form-label"><i class="fa-solid fa-file-medical"></i> MRN, Phone Number, or Email</label>
+          <input type="text" name="login_id" class="form-control" placeholder="e.g. MRN-100201 or 9876543210" required autofocus>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label"><i class="fa-solid fa-user"></i> First Name (Optional verification)</label>
+          <input type="text" name="first_name" class="form-control" placeholder="e.g. John">
+        </div>
+
+        <button type="submit" class="btn btn-accent btn-full" style="padding: 0.9rem;"><i class="fa-solid fa-right-to-bracket"></i> Login to Patient Dashboard</button>
+      </form>
+
+      <div style="text-align: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+        <p style="font-size: 0.9rem; color: var(--text-muted);">Don't have a Medical Record Number yet?</p>
+        <a href="{% url 'patient_register' %}" class="btn btn-secondary btn-sm" style="margin-top: 0.5rem;"><i class="fa-solid fa-user-plus"></i> Register New Patient Account</a>
+      </div>
+
+      <div style="text-align: center; margin-top: 1rem; font-size: 0.85rem; color: var(--text-muted);">
+        Demo Login: MRN: <b>MRN-100201</b> (John Doe)
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
