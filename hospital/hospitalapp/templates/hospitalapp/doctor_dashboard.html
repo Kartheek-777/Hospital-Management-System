@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Doctor Dashboard</title>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #f0f4f7;
+        margin: 0;
+        padding: 0;
+      }
+
+      .dashboard-container {
+        width: 500px;
+        margin: 80px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+        text-align: center;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 20px;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      ul li {
+        margin: 15px 0;
+      }
+
+      ul li a {
+        text-decoration: none;
+        color: white;
+        background: #007bff;
+        padding: 12px 20px;
+        border-radius: 5px;
+        display: inline-block;
+        transition: background 0.3s;
+      }
+
+      ul li a:hover {
+        background: #0056b3;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="dashboard-container">
+      <h1>Welcome, Dr. {{ doctor.first_name }} {{ doctor.last_name }}</h1>
+      <ul>
+        <li><a href="{% url 'view_appointments' %}">View Appointments</a></li>
+        <li><a href="{% url 'view_patients' %}">View Patients</a></li>
+        <li><a href="{% url 'doctor_logout' %}">Logout</a></li>
+      </ul>
+    </div>
+  </body>
+</html>
